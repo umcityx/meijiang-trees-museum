@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>梅江区二级古树博物馆 - 千年古树，岁月见证</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary-green: #2a5c3d;
+            --secondary-green: #4a7c59;
+            --light-green: #8fbc8f;
+            --earth-brown: #8b7355;
+            --light-brown: #d2b48c;
+            --light-bg: #f8f8f4;
+            --text-dark: #333;
+            --text-light: #f5f5f5;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* 头部样式 */
+        header {
+            background: linear-gradient(to right, var(--primary-green), var(--secondary-green));
+            color: var(--text-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav li {
+            margin-left: 1.5rem;
+        }
+        
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* 主横幅样式 */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.5)), 
+                        url('https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            color: var(--text-light);
+            padding: 5rem 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: var(--light-green);
+            color: var(--text-dark);
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 2px solid var(--light-green);
+        }
+        
+        .cta-button:hover {
+            background-color: transparent;
+            color: var(--light-green);
+        }
+        
+        /* 主要区域样式 */
+        section {
+            padding: 4rem 0;
+        }
+        
+        section:nth-child(even) {
+            background-color: #f0f0e8;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--primary-green);
+            position: relative;
+        }
+        
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: var(--light-brown);
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+        
+        /* 古树展示 */
+        .trees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .tree-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .tree-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tree-img {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .tree-info {
+            padding: 1.5rem;
+        }
+        
+        .tree-name {
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+        
+        .tree-age {
+            color: var(--earth-brown);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .tree-desc {
+            color: #666;
+            margin-bottom: 1rem;
+            height: 60px;
+            overflow: hidden;
+        }
+        
+        .tree-link {
+            display: inline-block;
+            color: var(--secondary-green);
+            font-weight: 600;
+            text-decoration: none;
+            padding: 5px 0;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        
+        .tree-link:hover {
+            border-color: var(--secondary-green);
+        }
+        
+        /* 地图区域 */
+        #tree-map {
+            height: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .map-info {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .map-stats {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        /* 虚拟探索 */
+        .virtual-explore {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .virtual-content {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .virtual-image {
+            flex: 1;
+            min-width: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .virtual-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .virtual-features {
+            margin: 1.5rem 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background-color: var(--light-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary-green);
+            font-size: 1.2rem;
+        }
+        
+        /* 统计图表区域 */
+        .stats-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .chart-title {
+            margin-bottom: 1rem;
+            color: var(--primary-green);
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        .chart {
+            height: 250px;
+            position: relative;
+        }
+        
+        .chart-bar {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 200px;
+            margin-top: 20px;
+        }
+        
+        .bar {
+            width: 40px;
+            background-color: var(--secondary-green);
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: height 0.5s ease;
+        }
+        
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+        
+        /* 搜索和筛选 */
+        .filter-section {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .search-box {
+            position: relative;
+            flex: 2;
+            min-width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px 8px 40px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .filter-btn {
+            padding: 8px 20px;
+            background-color: var(--secondary-green);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .filter-btn:hover {
+            background-color: var(--primary-green);
+        }
+        
+        .reset-btn {
+            padding: 8px 20px;
+            background-color: #eee;
+            color: #666;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .reset-btn:hover {
+            background-color: #ddd;
+        }
+        
+        /* 底部样式 */
+        footer {
+            background-color: var(--primary-green);
+            color: var(--text-light);
+            padding: 3rem 0 1.5rem;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-section h3:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--light-green);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--light-green);
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .social-icons a:hover {
+            background-color: var(--light-green);
+            transform: translateY(-5px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav {
+                margin-top: 1rem;
+                width: 100%;
+            }
+            
+            nav ul {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            nav li {
+                margin: 0 10px 10px;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .trees-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .map-info {
+                flex-direction: column;
+            }
+            
+            .map-stats {
+                justify-content: space-around;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero {
+                padding: 3rem 0;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .tree-card {
+                margin-bottom: 20px;
+            }
+            
+            .trees-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-tree"></i>
+                <span>梅江区二级古树博物馆</span>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav id="mainNav">
+                <ul>
+                    <li><a href="#home" class="active">首页</a></li>
+                    <li><a href="#explore">古树探索</a></li>
+                    <li><a href="#map">古树地图</a></li>
+                    <li><a href="#stats">统计分析</a></li>
+                    <li><a href="#virtual">虚拟游览</a></li>
+                    <li><a href="#about">关于我们</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主横幅 -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>梅江区二级古树博物馆</h1>
+            <p>探索梅江区13株二级古树，了解它们的历史故事，感受自然与文化的交融。线上古树博物馆带您领略跨越数百年的生命奇迹。</p>
+            <a href="#explore" class="cta-button">开始探索</a>
+        </div>
+    </section>
+
+    <!-- 古树展示区 -->
+    <section id="explore">
+        <div class="container">
+            <h2 class="section-title">梅江区二级古树</h2>
+            
+            <!-- 筛选和搜索区域 -->
+            <div class="filter-section">
+                <div class="filter-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="搜索古树名称、别名或位置...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="speciesFilter">树种筛选</label>
+                        <select id="speciesFilter">
+                            <option value="">全部树种</option>
+                            <option value="雅榕">雅榕</option>
+                            <option value="榕树">榕树</option>
+                            <option value="尾叶紫薇">尾叶紫薇</option>
+                            <option value="白桂木">白桂木</option>
+                            <option value="木荷">木荷</option>
+                            <option value="樟">樟</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="ageFilter">树龄筛选</label>
+                        <select id="ageFilter">
+                            <option value="">全部树龄</option>
+                            <option value="300">300年以下</option>
+                            <option value="310">310-330年</option>
+                            <option value="340">340年以上</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button class="filter-btn" id="applyFilters">筛选</button>
+                    <button class="reset-btn" id="resetFilters">重置</button>
+                </div>
+            </div>
+            
+            <div class="trees-grid" id="treesContainer">
+                <!-- 古树卡片将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 古树地图 -->
+    <section id="map">
+        <div class="container">
+            <h2 class="section-title">古树分布地图</h2>
+            <div id="tree-map"></div>
+            <div class="map-info">
+                <div class="map-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="treeCount">0</span>
+                        <span class="stat-label">已收录古树</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="speciesCount">0</span>
+                        <span class="stat-label">古树种类</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="oldestTree">0</span>
+                        <span class="stat-label">最古老树龄</span>
+                    </div>
+                </div>
+                <p>地图展示了梅江区二级古树的位置，点击标记可查看详细信息</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 统计分析 -->
+    <section id="stats">
+        <div class="container">
+            <h2 class="section-title">古树统计分析</h2>
+            <div class="stats-charts">
+                <div class="chart-container">
+                    <h3 class="chart-title">古树种类分布</h3>
+                    <div class="chart" id="speciesChart">
+                        <div class="chart-bar" id="speciesBarChart">
+                            <!-- 柱状图将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">古树所在镇街分布</h3>
+                    <div class="chart" id="locationChart">
+                        <div class="chart-bar" id="locationBarChart">
+                            <!-- 柱状图将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">古树树龄分布</h3>
+                    <div class="chart" id="ageChart">
+                        <div class="chart-bar" id="ageBarChart">
+                            <!-- 柱状图将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 虚拟游览 -->
+    <section id="virtual">
+        <div class="container">
+            <h2 class="section-title">虚拟古树探索</h2>
+            <div class="virtual-explore">
+                <div class="virtual-content">
+                    <p>我们的虚拟探索功能让您足不出户即可体验古树的壮丽景象。通过360度全景视角、季节变化模拟和古树故事讲解，带您深入了解每一棵古树的历史与现状。</p>
+                    <div class="virtual-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-vr-cardboard"></i>
+                            </div>
+                            <div>
+                                <h3>360°全景体验</h3>
+                                <p>全方位查看古树及其周围环境，仿佛身临其境。</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div>
+                                <h3>季节变化模拟</h3>
+                                <p>查看古树在不同季节的样貌变化，感受时光流转。</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div>
+                                <h3>历史故事讲解</h3>
+                                <p>了解古树背后的历史传说和文化意义。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="cta-button" id="virtualTourBtn">开始虚拟游览</button>
+                </div>
+                <div class="virtual-image">
+                    <img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80" alt="虚拟古树游览">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我们 -->
+    <section id="about">
+        <div class="container">
+            <h2 class="section-title">关于梅江区古树博物馆</h2>
+            <div class="virtual-explore">
+                <div class="virtual-image">
+                    <img src="https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="古树保护">
+                </div>
+                <div class="virtual-content">
+                    <p>梅江区古树博物馆是一个致力于保护、研究和展示梅江区古树名木的数字化平台。我们通过数字技术记录古树的生长状态、历史故事和生态价值，提高公众对古树保护的意识。</p>
+                    <p>我们的使命是：</p>
+                    <ul style="margin-left: 20px; margin-top: 10px; margin-bottom: 20px;">
+                        <li>建立完整的古树数字档案</li>
+                        <li>推广古树保护知识</li>
+                        <li>提供虚拟古树探索体验</li>
+                        <li>连接古树爱好者和研究者</li>
+                    </ul>
+                    <p>目前，我们已经收录了梅江区13株二级古树的详细信息，涵盖雅榕、榕树、尾叶紫薇、白桂木、木荷和樟等多种树种。</p>
+                    <p>这些古树分布于城北镇、西阳镇、三角镇、长沙镇、金山街道和江南街道等区域，树龄在300-360年之间，是梅江区宝贵的自然与文化遗产。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>梅江区古树博物馆</h3>
+                    <p>探索千年古树，感受自然奇迹。我们致力于通过数字技术保护和展示梅江区古树文化遗产。</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                        <a href="#"><i class="fab fa-qq"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>快速链接</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#explore">古树探索</a></li>
+                        <li><a href="#map">古树地图</a></li>
+                        <li><a href="#stats">统计分析</a></li>
+                        <li><a href="#virtual">虚拟游览</a></li>
+                        <li><a href="#about">关于我们</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>联系我们</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 广东省梅州市梅江区</li>
+                        <li><i class="fas fa-phone"></i> 0753-12345678</li>
+                        <li><i class="fas fa-envelope"></i> contact@meijiangtrees.cn</li>
+                        <li><i class="fas fa-clock"></i> 周一至周五 9:00-18:00</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 梅江区古树博物馆. 保留所有权利. | 粤ICP备12345678号</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // 梅江区二级古树数据 - 根据Excel文件整理
+        const treesData = [
+            {
+                id: 1,
+                name: "雅榕（榕树公公）",
+                otherName: "小叶榕",
+                latinName: "Ficus concinna （Miq.）Miq.",
+                age: "320年",
+                location: "城北镇玉水村上水坑",
+                fullLocation: "广东省梅州市梅江区城北镇玉水村上水坑",
+                description: "玉水村先人到此地安居前，受高人指点，在玉水村四处风水之地设局以升官聚财之势。其中村东村西中夫妻树各一棵村东为夫树村西为妻树两树遥相对望夫妻树均是玉水村先人请外地无名乞丐栽种。村东、村西两树被当地村民分别称为'榕树公公'、'榕树婆婆'。百年古树虽历沧桑仍是枝繁叶茂，榕树婆婆结子大而甜，榕树公公结子细而涩。此树便为榕树公公。",
+                image: "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
+                lat: 24.357729,
+                lng: 116.019717,
+                height: "16.0米",
+                dbh: "870.0厘米",
+                canopy: "32.0米",
+                feature: "具有明显气生根和板状根",
+                manageUnit: "玉水村委会",
+                oddityDescriptions: "具有明显气生根和板状根。",
+                level: "二级",
+                family: "桑科",
+                genus: "榕属",
+                estimateAge: 320,
+                town: "城北镇"
+            },
+            {
+                id: 2,
+                name: "雅榕（榕树婆婆）",
+                otherName: "小叶榕",
+                latinName: "Ficus concinna （Miq.）Miq.",
+                age: "320年",
+                location: "城北镇玉水村一社菱角塘",
+                fullLocation: "广东省梅州市梅江区城北镇玉水村一社菱角塘",
+                description: "关于这株榕树当地人相传，玉水村先人到此地安居前，受高人指点，在玉水村四处风水之地设局以升官聚财之势。其中村东、村西中夫妻树各一棵，村东为夫树，村西为妻树，两树遥相对望，夫、妻树均是玉水村先人请外地无名乞丐栽种。村东、村西两树被当地村民分别称为'榕树公公'、'榕树婆婆'。百年古树虽历沧桑仍是枝繁叶茂，榕树婆婆结子大而甜，榕树公公结子细而涩。此树便为榕树婆婆。",
+                image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                lat: 24.360517,
+                lng: 116.014804,
+                height: "16.0米",
+                dbh: "736.0厘米",
+                canopy: "34.0米",
+                feature: "多干，老干虬枝，树体高大，树冠婆娑，枝叶茂盛",
+                manageUnit: "玉水村委会",
+                oddityDescriptions: "多干，老干虬枝，树体高大，树冠婆娑，枝叶茂盛。",
+                level: "二级",
+                family: "桑科",
+                genus: "榕属",
+                estimateAge: 320,
+                town: "城北镇"
+            },
+            {
+                id: 3,
+                name: "雅榕",
+                otherName: "小叶榕",
+                latinName: "Ficus concinna （Miq.）Miq.",
+                age: "330年",
+                location: "城北镇群益村桃李下桃沅墩",
+                fullLocation: "广东省梅州市梅江区城北镇群益村桃李下桃沅墩",
+                description: "群益村桃李下桃沅墩自然村前水口林，据传建村时已存，村民保护存留下来。",
+                image: "https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
+                lat: 24.40686801,
+                lng: 116.02927501,
+                height: "21.0米",
+                dbh: "722.0厘米",
+                canopy: "45.0米",
+                feature: "树形高大，树冠婆娑，枝叶茂盛，为村口一景观",
+                manageUnit: "群益村委会",
+                oddityDescriptions: "树形高大，树冠婆娑，枝叶茂盛，为村口一景观。",
+                level: "二级",
+                family: "桑科",
+                genus: "榕属",
+                estimateAge: 330,
+                town: "城北镇"
+            },
+            {
+                id: 4,
+                name: "雅榕",
+                otherName: "小叶榕，万年青，细叶榕",
+                latinName: "Ficus concinna （Miq.）Miq.",
+                age: "350年",
+                location: "城北镇群益村桃李下桃沅墩",
+                fullLocation: "广东省梅州市梅江区城北镇群益村桃李下桃沅墩",
+                description: "明阳村曾家老屋边，据传老屋历史已300年，建屋时已存。",
+                image: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80",
+                lat: 24.404394,
+                lng: 116.027268,
+                height: "22.0米",
+                dbh: "707.0厘米",
+                canopy: "30.0米",
+                feature: "具有明显气生根和板状根，有一侧枝卧姿横生",
+                manageUnit: "群益村委会",
+                oddityDescriptions: "具有明显气生根和板状根，有一侧枝卧姿横生。",
+                level: "二级",
+                family: "桑科",
+                genus: "榕属",
+                estimateAge: 350,
+                town: "城北镇"
+            },
+            {
+                id: 5,
+                name: "榕树",
+                otherName: "雅榕，万年青",
+                latinName: "Ficus microcarpa",
+                age: "330年",
+                location: "江南街道梅江社区居委会狮子二巷",
+                fullLocation: "广东省梅州市梅江区江南街道梅江社区居委会狮子二巷",
+                description: "是狮子巷的伯公树，据了解当地群众，该榕树大概1690年已生长于此，距今约330年。",
+                image: "https://images.unsplash.com/photo-1515965881346-57e47d6d2c7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1976&q=80",
+                lat: 24.298016,
+                lng: 116.114001,
+                height: "19.0米",
+                dbh: "630.0厘米",
+                canopy: "8.0米",
+                feature: "干形通直，树体高大，盘根错节",
+                manageUnit: "梅江社区居委会",
+                oddityDescriptions: "干形通直，树体高大，盘根错节。",
+                level: "二级",
+                family: "桑科",
+                genus: "榕属",
+                estimateAge: 330,
+                town: "江南街道"
+            },
+            {
+                id: 6,
+                name: "雅榕",
+                otherName: "小叶榕",
+                latinName: "Ficus concinna （Miq.）Miq.",
+                age: "330年",
+                location: "西阳镇鲤溪村万山村村口公王庙",
+                fullLocation: "广东省梅州市梅江区西阳镇鲤溪村万山村村口公王庙",
+                description: "与万山村村口公王庙同期",
+                image: "https://images.unsplash.com/photo-1572015097908-0216df6d2ea2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
+                lat: 24.284472,
+                lng: 116.269802,
+                height: "16.0米",
+                dbh: "1065.0厘米",
+                canopy: "35.0米",
+                feature: "树冠婆娑，枝叶茂盛",
+                manageUnit: "鲤溪村委会",
+                oddityDescriptions: "树冠婆娑，枝叶茂盛。",
+                level: "二级",
+                family: "桑科",
+                genus: "榕属",
+                estimateAge: 330,
+                town: "西阳镇"
+            },
+            {
+                id: 7,
+                name: "尾叶紫薇",
+                otherName: "尾叶紫薇",
+                latinName: "Lagerstroemia caudata Chun et How ex S.Lee et L.Lau",
+                age: "350年",
+                location: "金山街道月梅村嘉应学院中区",
+                fullLocation: "广东省梅州市梅江区金山街道月梅村嘉应学院中区",
+                description: "为百年校庆时校友从湛江采购，捐赠于嘉应学院图书馆旁边的小游园里植立，在原地已有300年。",
+                image: "https://images.unsplash.com/photo-1515965881346-57e47d6d2c7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1976&q=80",
+                lat: 24.331577,
+                lng: 116.122622,
+                height: "19.0米",
+                dbh: "700.0厘米",
+                canopy: "10.0米",
+                feature: "粗壮的树干挺拔直立，布满银斑，枝叶竞相伸展，已然成为校园一大壮观。待转入秋，浓绿的枝叶渐渐染上红色，又是校园一番别样的景色。",
+                manageUnit: "嘉应学院",
+                oddityDescriptions: "粗壮的树干挺拔直立，布满银斑，枝叶竞相伸展，已然成为校园一大壮观。待转入秋，浓绿的枝叶渐渐染上红色，又是校园一番别样的景色。",
+                level: "二级",
+                family: "千屈菜科",
+                genus: "紫薇属",
+                estimateAge: 350,
+                town: "金山街道"
+            },
+            {
+                id: 8,
+                name: "榕树",
+                otherName: "雅榕，万年青",
+                latinName: "Ficus microcarpa",
+                age: "310年",
+                location: "西阳镇白宫社区居委会白宫居委老人活动中心",
+                fullLocation: "广东省梅州市梅江区西阳镇白宫社区居委会白宫居委老人活动中心",
+                description: "白宫居委老人活动中心",
+                image: "https://images.unsplash.com/photo-1515965881346-57e47d6d2c7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1976&q=80",
+                lat: 24.281436,
+                lng: 116.232542,
+                height: "16.0米",
+                dbh: "650.0厘米",
+                canopy: "26.0米",
+                feature: "一干双枝，枝叶茂盛",
+                manageUnit: "白宫社区居委会",
+                oddityDescriptions: "一干双枝，枝叶茂盛",
+                level: "二级",
+                family: "桑科",
+                genus: "榕属",
+                estimateAge: 310,
+                town: "西阳镇"
+            },
+            {
+                id: 9,
+                name: "白桂木",
+                otherName: "胭脂木，将军树",
+                latinName: "Artocarpus hypargyreus",
+                age: "350年",
+                location: "三角镇泮坑村田子庵",
+                fullLocation: "广东省梅州市梅江区三角镇泮坑村田子庵",
+                description: "田子庵已有300年历史，白桂木依田子庵一旁生长，日复一日，年复一年，风雨不倒。",
+                image: "https://images.unsplash.com/photo-1515965881346-57e47d6d2c7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1976&q=80",
+                lat: 24.240616,
+                lng: 116.151011,
+                height: "19.0米",
+                dbh: "339.0厘米",
+                canopy: "18.0米",
+                feature: "主干明显，二米处多分叉，生长良好",
+                manageUnit: "泮坑村委会",
+                oddityDescriptions: "主干明显，二米处多分叉，生长良好。",
+                level: "二级",
+                family: "桑科",
+                genus: "波罗蜜属",
+                estimateAge: 350,
+                town: "三角镇"
+            },
+            {
+                id: 10,
+                name: "榕树",
+                otherName: "雅榕，万年青",
+                latinName: "Ficus microcarpa",
+                age: "320年",
+                location: "西阳镇龙岗村龙岗村承启楼",
+                fullLocation: "广东省梅州市梅江区西阳镇龙岗村龙岗村承启楼",
+                description: "据龙岗村村委会说丐帮第十九代人种植",
+                image: "https://images.unsplash.com/photo-1515965881346-57e47d6d2c7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1976&q=80",
+                lat: 24.282242,
+                lng: 116.235001,
+                height: "9.0米",
+                dbh: "500.0厘米",
+                canopy: "6.0米",
+                feature: "树干分三叉",
+                manageUnit: "龙岗村村委会",
+                oddityDescriptions: "树干分三叉。",
+                level: "二级",
+                family: "桑科",
+                genus: "榕属",
+                estimateAge: 320,
+                town: "西阳镇"
+            },
+            {
+                id: 11,
+                name: "木荷",
+                otherName: "何树",
+                latinName: "Schima superba",
+                age: "300年",
+                location: "西阳镇嶂下村吊简坑张屋背",
+                fullLocation: "广东省梅州市梅江区西阳镇嶂下村吊简坑张屋背",
+                description: "吊简坑屋已有三百年历史，据说建屋前此木荷树已存。",
+                image: "https://images.unsplash.com/photo-1515965881346-57e47d6d2c7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1976&q=80",
+                lat: 24.260564,
+                lng: 116.310294,
+                height: "16.0米",
+                dbh: "348.0厘米",
+                canopy: "22.0米",
+                feature: "干形通直，树体高大",
+                manageUnit: "嶂下村委会",
+                oddityDescriptions: "干形通直，树体高大。",
+                level: "二级",
+                family: "山茶科",
+                genus: "木荷属",
+                estimateAge: 300,
+                town: "西阳镇"
+            },
+            {
+                id: 12,
+                name: "榕树",
+                otherName: "小叶榕，万年青，细叶榕",
+                latinName: "Ficus microcarpa",
+                age: "360年",
+                location: "城北镇明阳村明阳村",
+                fullLocation: "广东省梅州市梅江区城北镇明阳村明阳村",
+                description: "明阳村曾家老屋边，据传老屋历史已300年，建屋时已存。",
+                image: "https://images.unsplash.com/photo-1515965881346-57e47d6d2c7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1976&q=80",
+                lat: 24.318839,
+                lng: 116.073801,
+                height: "12.0米",
+                dbh: "365.0厘米",
+                canopy: "19.0米",
+                feature: "具有明显气生根和板状根，有一侧枝卧姿横生",
+                manageUnit: "明阳村委会",
+                oddityDescriptions: "具有明显气生根和板状根，有一侧枝卧姿横生。",
+                level: "二级",
+                family: "桑科",
+                genus: "榕属",
+                estimateAge: 360,
+                town: "城北镇"
+            },
+            {
+                id: 13,
+                name: "樟",
+                otherName: "小叶樟，樟木子",
+                latinName: "Cinnamomum camphora",
+                age: "310年",
+                location: "长沙镇小密村小密水库",
+                fullLocation: "广东省梅州市梅江区长沙镇小密村小密水库",
+                description: "柿子坪自然村历史相同。",
+                image: "https://images.unsplash.com/photo-1515965881346-57e47d6d2c7a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1976&q=80",
+                lat: 24.230565,
+                lng: 116.131616,
+                height: "19.0米",
+                dbh: "336.0厘米",
+                canopy: "14.0米",
+                feature: "干形通直，树体高大",
+                manageUnit: "小密村委会",
+                oddityDescriptions: "干形通直，树体高大。",
+                level: "二级",
+                family: "樟科",
+                genus: "樟属",
+                estimateAge: 310,
+                town: "长沙镇"
+            }
+        ];
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 渲染古树卡片
+            renderTreeCards(treesData);
+            
+            // 初始化地图
+            initMap(treesData);
+            
+            // 更新统计数据
+            updateStats(treesData);
+            
+            // 绘制统计图表
+            renderCharts(treesData);
+            
+            // 移动菜单功能
+            setupMobileMenu();
+            
+            // 平滑滚动
+            setupSmoothScroll();
+            
+            // 绑定筛选功能
+            setupFilters();
+            
+            // 绑定虚拟游览按钮
+            document.getElementById('virtualTourBtn').addEventListener('click', function() {
+                alert('虚拟游览功能开发中，即将推出！');
+            });
+        });
+
+        // 渲染古树卡片
+        function renderTreeCards(trees) {
+            const treesContainer = document.getElementById('treesContainer');
+            treesContainer.innerHTML = '';
+            
+            if (trees.length === 0) {
+                treesContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #666;">没有找到符合条件的古树</p>';
+                return;
+            }
+            
+            trees.forEach(tree => {
+                const treeCard = document.createElement('div');
+                treeCard.className = 'tree-card';
+                treeCard.innerHTML = `
+                    <img src="${tree.image}" alt="${tree.name}" class="tree-img">
+                    <div class="tree-info">
+                        <h3 class="tree-name">${tree.name}</h3>
+                        <div class="tree-age">树龄：${tree.age} | 位置：${tree.location}</div>
+                        <div class="tree-desc">${tree.description.substring(0, 80)}${tree.description.length > 80 ? '...' : ''}</div>
+                        <a href="#" class="tree-link" data-id="${tree.id}">查看更多 →</a>
+                    </div>
+                `;
+                treesContainer.appendChild(treeCard);
+            });
+            
+            // 为查看更多链接添加点击事件
+            document.querySelectorAll('.tree-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const treeId = this.getAttribute('data-id');
+                    showTreeDetails(treeId, trees);
+                });
+            });
+        }
+
+        // 初始化地图
+        function initMap(trees) {
+            // 初始化地图，设置中心位置为梅江区
+            const map = L.map('tree-map').setView([24.31, 116.12], 11);
+            
+            // 添加地图图层
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // 为每棵古树添加标记
+            trees.forEach(tree => {
+                const marker = L.marker([tree.lat, tree.lng]).addTo(map);
+                marker.bindPopup(`
+                    <h3 style="margin: 0 0 10px 0; color: var(--primary-green);">${tree.name}</h3>
+                    <p style="margin: 5px 0;"><strong>树龄：</strong>${tree.age}</p>
+                    <p style="margin: 5px 0;"><strong>位置：</strong>${tree.location}</p>
+                    <p style="margin: 5px 0;"><strong>特征：</strong>${tree.feature.substring(0, 50)}${tree.feature.length > 50 ? '...' : ''}</p>
+                    <button onclick="showTreeDetails(${tree.id})" style="margin-top: 10px; padding: 5px 10px; background-color: var(--secondary-green); color: white; border: none; border-radius: 3px; cursor: pointer;">查看详情</button>
+                `);
+            });
+        }
+
+        // 更新统计数据
+        function updateStats(trees) {
+            document.getElementById('treeCount').textContent = trees.length;
+            
+            // 计算古树种类
+            const speciesSet = new Set(trees.map(tree => tree.name.split('（')[0]));
+            document.getElementById('speciesCount').textContent = speciesSet.size;
+            
+            // 计算最古老树龄
+            const maxAge = Math.max(...trees.map(tree => tree.estimateAge));
+            document.getElementById('oldestTree').textContent = maxAge + '年';
+        }
+
+        // 绘制统计图表
+        function renderCharts(trees) {
+            // 古树种类分布
+            const speciesCount = {};
+            trees.forEach(tree => {
+                const species = tree.name.split('（')[0];
+                speciesCount[species] = (speciesCount[species] || 0) + 1;
+            });
+            
+            renderBarChart('speciesBarChart', speciesCount, '种类');
+            
+            // 古树所在镇街分布
+            const townCount = {};
+            trees.forEach(tree => {
+                townCount[tree.town] = (townCount[tree.town] || 0) + 1;
+            });
+            
+            renderBarChart('locationBarChart', townCount, '镇街');
+            
+            // 古树树龄分布
+            const ageGroups = {
+                '300年以下': 0,
+                '310-330年': 0,
+                '340年以上': 0
+            };
+            
+            trees.forEach(tree => {
+                if (tree.estimateAge < 310) {
+                    ageGroups['300年以下']++;
+                } else if (tree.estimateAge <= 330) {
+                    ageGroups['310-330年']++;
+                } else {
+                    ageGroups['340年以上']++;
+                }
+            });
+            
+            renderBarChart('ageBarChart', ageGroups, '树龄段');
+        }
+        
+        // 渲染柱状图
+        function renderBarChart(chartId, data, labelType) {
+            const chartContainer = document.getElementById(chartId);
+            chartContainer.innerHTML = '';
+            
+            const keys = Object.keys(data);
+            const values = Object.values(data);
+            const maxValue = Math.max(...values);
+            
+            keys.forEach((key, index) => {
+                const barHeight = (values[index] / maxValue) * 150;
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${barHeight}px`;
+                bar.innerHTML = `
+                    <div class="bar-value">${values[index]}</div>
+                    <div class="bar-label">${key}</div>
+                `;
+                chartContainer.appendChild(bar);
+            });
+        }
+
+        // 显示古树详情
+        function showTreeDetails(treeId, trees = treesData) {
+            const tree = trees.find(t => t.id == treeId);
+            if (!tree) return;
+            
+            // 创建详情模态框
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 2000;
+                padding: 20px;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background-color: white; border-radius: 10px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto;">
+                    <div style="position: relative;">
+                        <img src="${tree.image}" alt="${tree.name}" style="width: 100%; height: 300px; object-fit: cover; border-radius: 10px 10px 0 0;">
+                        <button id="closeModal" style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer;">×</button>
+                    </div>
+                    <div style="padding: 2rem;">
+                        <h2 style="color: var(--primary-green); margin-bottom: 0.5rem;">${tree.name}</h2>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1.5rem;">
+                            <div style="background-color: #f0f0e8; padding: 8px 15px; border-radius: 20px;">
+                                <strong>树龄：</strong>${tree.age}
+                            </div>
+                            <div style="background-color: #f0f0e8; padding: 8px 15px; border-radius: 20px;">
+                                <strong>位置：</strong>${tree.location}
+                            </div>
+                            <div style="background-color: #f0f0e8; padding: 8px 15px; border-radius: 20px;">
+                                <strong>保护等级：</strong>${tree.level}
+                            </div>
+                            <div style="background-color: #f0f0e8; padding: 8px 15px; border-radius: 20px;">
+                                <strong>树种：</strong>${tree.name.split('（')[0]}
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <h3 style="color: var(--secondary-green); margin-bottom: 0.5rem;">基本信息</h3>
+                                <p><strong>别名：</strong>${tree.otherName}</p>
+                                <p><strong>拉丁名：</strong>${tree.latinName}</p>
+                                <p><strong>科属：</strong>${tree.family} ${tree.genus}</p>
+                                <p><strong>树高：</strong>${tree.height}</p>
+                                <p><strong>胸径：</strong>${tree.dbh}</p>
+                                <p><strong>冠幅：</strong>${tree.canopy}</p>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--secondary-green); margin-bottom: 0.5rem;">管理与保护</h3>
+                                <p><strong>管理单位：</strong>${tree.manageUnit}</p>
+                                <p><strong>奇特描述：</strong>${tree.oddityDescriptions}</p>
+                                <p><strong>具体位置：</strong>${tree.fullLocation}</p>
+                            </div>
+                        </div>
+                        <h3 style="color: var(--secondary-green); margin-bottom: 0.5rem;">历史与故事</h3>
+                        <p style="margin-bottom: 1.5rem; line-height: 1.8;">${tree.description}</p>
+                        <h3 style="color: var(--secondary-green); margin-bottom: 0.5rem;">形态特征</h3>
+                        <p style="margin-bottom: 1.5rem;">${tree.feature}</p>
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button id="viewOnMap" style="background-color: var(--secondary-green); color: white; border: none; padding: 12px 30px; border-radius: 5px; font-size: 1rem; cursor: pointer; margin-right: 10px;">在地图上查看</button>
+                            <button id="virtualTourDetail" style="background-color: var(--light-green); color: var(--text-dark); border: none; padding: 12px 30px; border-radius: 5px; font-size: 1rem; cursor: pointer;">虚拟游览</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // 关闭模态框
+            document.getElementById('closeModal').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            // 点击地图查看
+            document.getElementById('viewOnMap').addEventListener('click', function() {
+                document.body.removeChild(modal);
+                // 滚动到地图区域
+                document.getElementById('map').scrollIntoView({behavior: 'smooth'});
+                
+                // 这里可以扩展为在地图上高亮显示该古树
+                setTimeout(() => {
+                    alert(`已在地图上定位到${tree.name}，位于${tree.location}`);
+                }, 500);
+            });
+            
+            // 虚拟游览
+            document.getElementById('virtualTourDetail').addEventListener('click', function() {
+                document.body.removeChild(modal);
+                // 滚动到虚拟游览区域
+                document.getElementById('virtual').scrollIntoView({behavior: 'smooth'});
+                
+                setTimeout(() => {
+                    alert(`开始${tree.name}的虚拟游览体验`);
+                }, 500);
+            });
+            
+            // 点击模态框外部关闭
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+
+        // 设置筛选功能
+        function setupFilters() {
+            const searchInput = document.getElementById('searchInput');
+            const speciesFilter = document.getElementById('speciesFilter');
+            const ageFilter = document.getElementById('ageFilter');
+            const applyFiltersBtn = document.getElementById('applyFilters');
+            const resetFiltersBtn = document.getElementById('resetFilters');
+            
+            applyFiltersBtn.addEventListener('click', function() {
+                filterTrees();
+            });
+            
+            resetFiltersBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                speciesFilter.value = '';
+                ageFilter.value = '';
+                filterTrees();
+            });
+            
+            // 搜索框输入时实时筛选
+            searchInput.addEventListener('input', function() {
+                filterTrees();
+            });
+            
+            // 下拉框改变时筛选
+            speciesFilter.addEventListener('change', filterTrees);
+            ageFilter.addEventListener('change', filterTrees);
+        }
+        
+        // 筛选古树
+        function filterTrees() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const speciesFilter = document.getElementById('speciesFilter').value;
+            const ageFilter = document.getElementById('ageFilter').value;
+            
+            let filteredTrees = treesData.filter(tree => {
+                // 搜索条件
+                const searchMatch = searchTerm === '' || 
+                    tree.name.toLowerCase().includes(searchTerm) ||
+                    tree.otherName.toLowerCase().includes(searchTerm) ||
+                    tree.location.toLowerCase().includes(searchTerm) ||
+                    tree.description.toLowerCase().includes(searchTerm);
+                
+                // 树种筛选
+                const speciesMatch = speciesFilter === '' || 
+                    tree.name.includes(speciesFilter) ||
+                    (speciesFilter === '榕树' && (tree.name.includes('榕') || tree.name.includes('榕树')));
+                
+                // 树龄筛选
+                let ageMatch = true;
+                if (ageFilter === '300') {
+                    ageMatch = tree.estimateAge < 310;
+                } else if (ageFilter === '310') {
+                    ageMatch = tree.estimateAge >= 310 && tree.estimateAge <= 330;
+                } else if (ageFilter === '340') {
+                    ageMatch = tree.estimateAge > 330;
+                }
+                
+                return searchMatch && speciesMatch && ageMatch;
+            });
+            
+            // 重新渲染古树卡片
+            renderTreeCards(filteredTrees);
+            
+            // 更新统计数据
+            updateStats(filteredTrees);
+            
+            // 重新绘制图表
+            renderCharts(filteredTrees);
+        }
+
+        // 移动菜单功能
+        function setupMobileMenu() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mainNav = document.getElementById('mainNav');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                const isVisible = mainNav.style.display === 'block';
+                mainNav.style.display = isVisible ? 'none' : 'block';
+                this.innerHTML = isVisible ? '<i class="fas fa-bars"></i>' : '<i class="fas fa-times"></i>';
+            });
+            
+            // 调整窗口大小时重新设置导航显示
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    mainNav.style.display = '';
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            });
+        }
+
+        // 平滑滚动
+        function setupSmoothScroll() {
+            // 导航链接点击平滑滚动
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        // 更新活动链接
+                        document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // 平滑滚动到目标
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                        
+                        // 移动端点击后关闭菜单
+                        if (window.innerWidth <= 768) {
+                            const mainNav = document.getElementById('mainNav');
+                            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                            mainNav.style.display = 'none';
+                            mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                        }
+                    }
+                });
+            });
+            
+            // CTA按钮平滑滚动
+            document.querySelector('.cta-button').addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetElement = document.querySelector(this.getAttribute('href'));
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    
+                    // 更新活动链接
+                    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+                    document.querySelector('nav a[href="#explore"]').classList.add('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
