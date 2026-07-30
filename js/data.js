@@ -1262,7 +1262,7 @@ const treesData = [
     location: '广东省梅州市梅县区城东镇潮塘村村名小组大岗上',
     description: '梅县区城东潮塘岗的这株梅花树，属真梅系直枝梅类宫粉型花梅，为梅花专一品种，被全国古梅专家王其超先生考察后定名为“潮塘宫粉”，并已载入 《梅国际登录年报2000》。树冠呈伞形，花重瓣，色淡红，香味浓郁，花径约2.5cm，花期12月下旬至次年1月下旬。此古梅是今广东发现的最古老花梅，有专家认为是宋梅，极具保存、研究、观赏价值。',
     image: 'images/chaotang_gongfen.jpg',
-    pointcloud: '/pointclouds/54.ply',
+    pointcloud: 'pointclouds/54.ply',
     lat: 24.36185301,
     lng: 116.16899701,
     height: '11.0 米',
