@@ -1,0 +1,14 @@
+# Zeabur 部署配置
+# 中文说明见同目录 ZEABUR.md
+
+[build]
+command = "npm install"
+
+[runtime]
+command = "node server.js"
+
+[env]
+PORT = "3000"
+NODE_ENV = "production"
+# 数据库挂载到 Zeabur 持久卷 /data（务必在控制台添加 Volume，Mount Path = /data，否则重启会丢数据）
+DB_PATH = "/data/museum.db"
