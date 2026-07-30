@@ -16,3 +16,11 @@ public/uploads/*
 Thumbs.db
 .idea/
 .vscode/
+
+# SQLite 数据库（首次启动自动生成，无需提交；shm/wal 为运行时临时文件）
+*.db
+*.db-shm
+*.db-wal
+
+# 推送用临时文件
+.push_tmp/
