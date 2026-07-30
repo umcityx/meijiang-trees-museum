@@ -1,0 +1,17 @@
+# Render 部署配置（Blueprint）
+# 用法：Render 网站 → New → Blueprint → 连接 umcityx/meijiang-trees-museum 仓库 → Apply
+services:
+  - type: web
+    name: meijiang-trees-museum
+    runtime: node
+    plan: free
+    branch: main
+    nodeVersion: "20.x"
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
