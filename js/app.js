@@ -643,9 +643,9 @@
     if (_threeQueue) { _threeQueue.push(cb); return; }
     _threeQueue = [cb];
     const urls = [
-      'https://unpkg.com/three@0.128.0/build/three.min.js',
-      'https://unpkg.com/three@0.128.0/examples/js/loaders/PLYLoader.js',
-      'https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js',
+      'vendor/three/three.min.js',
+      'vendor/three/PLYLoader.js',
+      'vendor/three/OrbitControls.js',
     ];
     let i = 0;
     (function next() {
